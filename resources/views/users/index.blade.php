@@ -6,8 +6,10 @@
 
 @push('pre_scripts')
     <script>
-        var listUsers = {!! $listUsers !!}
-        console.log(listUsers)
+        var listPaginatedUsers = {!! $listPaginatedUsers !!};
+        var perPage = {!! $perPage !!};
+        var total = {!! $total !!};
+        var currentPage = {!! $currentPage !!};
     </script>
 @endpush
 

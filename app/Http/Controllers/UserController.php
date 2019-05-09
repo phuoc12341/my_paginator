@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\User;
+use Illuminate\Contracts\Support\Jsonable;
 
 class UserController extends Controller
 {
@@ -13,11 +14,25 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $listUsers = User::all();
+        $paginatedUserData = User::paginate(3);
+        $listPaginatedUsers = collect($paginatedUserData->items());
+        $perPage = $paginatedUserData->perPage();
+        $total = $paginatedUserData->total();
+        $currentPage = $paginatedUserData->currentPage();
+        $compacts = [
+            'listPaginatedUsers' => $listPaginatedUsers,
+            'perPage' => $perPage,
+            'total' => $total,
+            'currentPage' => $currentPage,
+        ];
 
-        return view('users.index', ['listUsers' => $listUsers]);
+        if ($request->ajax()) {
+            return response()->json($compacts, 200);
+        }
+
+        return view('users.index', $compacts);
     }
 
     /**
@@ -84,13 +99,5 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function paginate()
-    {
-return "tesd";
-        $paginatedUsers = User::paginate(5);
-dd($paginatedUsers);
-        return response()->json(['paginatedUsers' => $paginatedUsers], 200);
     }
 }
