@@ -1,14 +1,14 @@
 <template>
   <div class="overflow-auto">
-    <b-pagination
-        v-model="currentPage"
-        :total-rows="total"
-        :per-page="perPage"
-        aria-controls="my-table"
-        align="center"
-        size="lg"
-        @change="loadPagination"
-    ></b-pagination>
+
+    <input class="form-control form-control-lg mt-3" type="text" placeholder="Search ..." v-model="searchUser" @change="searchPaginateUser">
+        
+    <div class="mt-3">
+        <input type="radio" id="name" value="name" v-model="searchUserFor">
+        <label for="name">Name</label><br>
+        <input type="radio" id="email" value="email" v-model="searchUserFor">
+        <label for="email">Email</label><br>
+    </div>
 
     <p class="mt-3">Current Page: {{ currentPage }}</p>
 
@@ -33,12 +33,22 @@
       </tbody>
     </table>
 
+    <b-pagination
+        v-model="currentPage"
+        :total-rows="total"
+        :per-page="perPage"
+        aria-controls="my-table"
+        align="center"
+        size="lg"
+        @change="loadPagination"
+    ></b-pagination>
+
   </div>
 </template>
 
 <script>
     import Common from '../../services/common';
-
+    var config = Common.config();
     export default {
         data() {
             return {
@@ -47,6 +57,8 @@
                 listPaginatedUsers: listPaginatedUsers,
                 total: total,
                 paginateUrl: laroute.route('users.index'),
+                searchUser: '',
+                searchUserFor: config.search_user_option.search_user_for,
             }
         },
         computed: {
@@ -56,11 +68,11 @@
         },
         methods: {
             loadPagination (selectedPageNumber) {
-                if (selectedPageNumber == this.currentPage) {
-                    console.log('no load')
-                } else {
+                if (selectedPageNumber != this.currentPage) {
                     let paginateParams = {
-                        page: selectedPageNumber
+                        page: selectedPageNumber,
+                        search: this.searchUser,
+                        searchUserFor: this.searchUserFor,
                     };
                     Common.paginate(this.paginateUrl, paginateParams)
                         .then( response => {
@@ -73,6 +85,22 @@
                             console.log(error);
                         })
                 }      
+            },
+            searchPaginateUser () {
+                let searchUserParams = {
+                    search: this.searchUser,
+                    searchUserFor: this.searchUserFor,
+                };
+                Common.searchUser(this.paginateUrl, searchUserParams)
+                    .then( response => {
+                        this.listPaginatedUsers = response.data.listPaginatedUsers;
+                        this.currentPage = response.data.currentPage;
+                        this.total = response.data.total;
+                        this.perPage = response.data.perPage;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
             }
         }
     }

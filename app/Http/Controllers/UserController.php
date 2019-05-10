@@ -6,9 +6,21 @@ use Illuminate\Http\Request;
 
 use App\User;
 use Illuminate\Contracts\Support\Jsonable;
+use App\Repo\UserRepository;
 
 class UserController extends Controller
 {
+    protected $userRepository;
+
+    /**
+     * Create a new controller instance.
+     * @return void
+     **/
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,17 +28,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $paginatedUserData = User::paginate(3);
-        $listPaginatedUsers = collect($paginatedUserData->items());
-        $perPage = $paginatedUserData->perPage();
-        $total = $paginatedUserData->total();
-        $currentPage = $paginatedUserData->currentPage();
-        $compacts = [
-            'listPaginatedUsers' => $listPaginatedUsers,
-            'perPage' => $perPage,
-            'total' => $total,
-            'currentPage' => $currentPage,
-        ];
+        $compacts =  $this->userRepository->index($request);
 
         if ($request->ajax()) {
             return response()->json($compacts, 200);
