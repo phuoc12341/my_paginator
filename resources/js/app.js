@@ -21,12 +21,17 @@ window.Vue = require('vue');
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('users-index-component', require('./components/users/index.vue').default);
+var indexPostComponent =  Vue.component('post-index-component', require('./components/posts/index.vue').default);
+var createPostComponent = Vue.component('post-create-component', require('./components/posts/create.vue').default);
+var appPostComponent = Vue.component('post-app-component', require('./components/posts/app.vue').default);
 
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import VueRouter from 'vue-router'
 
+Vue.use(VueRouter)
 Vue.use(BootstrapVue);
 
 const axios = require('axios');
@@ -37,6 +42,16 @@ const axios = require('axios');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+const routes = [
+    { path: '/posts/create', component: createPostComponent},
+    { path: '/posts/edit', component: createPostComponent},
+    { path: '/posts/index', component: indexPostComponent},
+]
+
+const router = new VueRouter({
+    routes
+})
+
 const app = new Vue({
-    el: '#app',
-});
+    router
+}).$mount('#app')
